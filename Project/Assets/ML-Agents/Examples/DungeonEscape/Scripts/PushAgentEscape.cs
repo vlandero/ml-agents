@@ -6,30 +6,50 @@ using Unity.MLAgents.Actuators;
 public class PushAgentEscape : Agent
 {
 
-    public GameObject MyKey; //my key gameobject. will be enabled when key picked up.
+    public GameObject myKey; //my key gameobject. will be enabled when key picked up.
+    public GameObject worldKey;
     public bool IHaveAKey; //have i picked up a key
     private PushBlockSettings m_PushBlockSettings;
     private Rigidbody m_AgentRb;
     private DungeonEscapeEnvController m_GameController;
+    float rewardScaleFactor = .001f;
+
+    private Vector2 zBound = new Vector2(-11f, 11f);
+    private Vector2 xBound = new Vector2(-11f, 11f);
+    private float yBound = 0.58f;
 
     public override void Initialize()
     {
         m_GameController = GetComponentInParent<DungeonEscapeEnvController>();
         m_AgentRb = GetComponent<Rigidbody>();
         m_PushBlockSettings = FindObjectOfType<PushBlockSettings>();
-        MyKey.SetActive(false);
+        myKey.SetActive(false);
         IHaveAKey = false;
     }
 
     public override void OnEpisodeBegin()
     {
-        MyKey.SetActive(false);
+        transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
+        // WorldKey.transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
+        myKey.SetActive(false);
         IHaveAKey = false;
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(IHaveAKey);
+
+        if (!IHaveAKey) // Only do this if we haven't picked up the key
+        {
+            GiveRewardBasedOnDistanceToKey();
+        }
+    }
+
+    private void GiveRewardBasedOnDistanceToKey()
+    {
+        float distanceToKey = Vector3.Distance(transform.position, worldKey.transform.position);
+        float reward = -distanceToKey;
+        AddReward(reward * rewardScaleFactor);
     }
 
     /// <summary>
@@ -75,6 +95,12 @@ public class PushAgentEscape : Agent
     {
         // Move the agent using the action.
         MoveAgent(actionBuffers.DiscreteActions);
+
+        if (StepCount >= MaxStep - 1)
+        {
+            AddReward(-.5f);
+            EndEpisode();
+        }
     }
 
     void OnCollisionEnter(Collision col)
@@ -83,7 +109,7 @@ public class PushAgentEscape : Agent
         {
             if (IHaveAKey)
             {
-                MyKey.SetActive(false);
+                myKey.SetActive(false);
                 IHaveAKey = false;
                 m_GameController.UnlockDoor();
             }
@@ -91,7 +117,7 @@ public class PushAgentEscape : Agent
         if (col.transform.CompareTag("dragon"))
         {
             m_GameController.KilledByBaddie(this, col);
-            MyKey.SetActive(false);
+            myKey.SetActive(false);
             IHaveAKey = false;
         }
         if (col.transform.CompareTag("portal"))
@@ -106,9 +132,10 @@ public class PushAgentEscape : Agent
         if (col.transform.CompareTag("key") && col.transform.parent == transform.parent && gameObject.activeInHierarchy)
         {
             print("Picked up key");
-            MyKey.SetActive(true);
+            myKey.SetActive(true);
             IHaveAKey = true;
-            col.gameObject.SetActive(false);
+            AddReward(1f);
+            EndEpisode();
         }
     }
 

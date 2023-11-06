@@ -231,7 +231,7 @@ public class DungeonEscapeEnvController : MonoBehaviour
             item.Agent.transform.SetPositionAndRotation(pos, rot);
             item.Rb.velocity = Vector3.zero;
             item.Rb.angularVelocity = Vector3.zero;
-            item.Agent.MyKey.SetActive(false);
+            item.Agent.myKey.SetActive(false);
             item.Agent.IHaveAKey = false;
             item.Agent.gameObject.SetActive(true);
             m_AgentGroup.RegisterAgent(item.Agent);

@@ -369,7 +369,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &855554230
 Transform:
   m_ObjectHideFlags: 0
@@ -1110,7 +1110,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2508780962454810567}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f0d060d8c3074edf80fc69e847d4c60, type: 3}
   m_Name: 
@@ -1968,7 +1968,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5077650082126629012
 Transform:
   m_ObjectHideFlags: 0
@@ -3996,6 +3996,10 @@ PrefabInstance:
       value: Cave
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 1a4b9dc81d687497caac7ac380e5acdd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 1a4b9dc81d687497caac7ac380e5acdd, type: 3}
       propertyPath: m_TagString
       value: portal
       objectReference: {fileID: 0}
@@ -4196,6 +4200,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 5184265935082300294, guid: 69a64861a32794a5db3bcea0cae3bef2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4290,6 +4299,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 5184265935082300294, guid: 69a64861a32794a5db3bcea0cae3bef2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4369,6 +4383,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 5184265935082300294, guid: 69a64861a32794a5db3bcea0cae3bef2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4388,6 +4407,41 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2512227112770887927}
     m_Modifications:
+    - target: {fileID: 4796904010917588665, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796904010917588665, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: m_BehaviorName
+      value: DungeonEscapeCustom
+      objectReference: {fileID: 0}
+    - target: {fileID: 4796904010917588665, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: m_BehaviorType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4828233698206621442, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: myKey
+      value: 
+      objectReference: {fileID: 8779779322142927225}
+    - target: {fileID: 4828233698206621442, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: MaxStep
+      value: 8000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4828233698206621442, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: WorldKey
+      value: 
+      objectReference: {fileID: 8779779321292819045}
+    - target: {fileID: 4828233698206621442, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: worldKey
+      value: 
+      objectReference: {fileID: 8779779321292819045}
     - target: {fileID: 4828233698206621445, guid: f3c5280e4ae094a9a9b8b6702630c941,
         type: 3}
       propertyPath: m_Name
@@ -4471,6 +4525,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c960fbbc7844c269d4d14ae68abfc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8779779322142927225 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2436825414900162134, guid: f3c5280e4ae094a9a9b8b6702630c941,
+    type: 3}
+  m_PrefabInstance: {fileID: 6343703853638268719}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6836821016094846379
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4554,6 +4614,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Column (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 5184265935082300294, guid: 69a64861a32794a5db3bcea0cae3bef2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4588,6 +4653,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DungeonEscapeAgent (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4828233698206621445, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4829017773430270460, guid: f3c5280e4ae094a9a9b8b6702630c941,
         type: 3}
@@ -4695,6 +4765,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DungeonEscapeAgent (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4828233698206621445, guid: f3c5280e4ae094a9a9b8b6702630c941,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4830954159424380931, guid: f3c5280e4ae094a9a9b8b6702630c941,
         type: 3}

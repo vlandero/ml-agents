@@ -1693,6 +1693,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DungeonEscapePlatform (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 2508780962454810567, guid: 5878a6d7527854d0a84b133c7c6efe55,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2512227112770887927, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}
       propertyPath: m_RootOrder

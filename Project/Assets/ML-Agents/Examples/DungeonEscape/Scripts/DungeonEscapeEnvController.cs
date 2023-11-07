@@ -123,7 +123,7 @@ public class DungeonEscapeEnvController : MonoBehaviour
     public void TouchedHazard(PushAgentEscape agent)
     {
         m_NumberOfRemainingPlayers--;
-        if (m_NumberOfRemainingPlayers == 0 || agent.IHaveAKey)
+        if (m_NumberOfRemainingPlayers == 0 || agent.IHaveAFlag)
         {
             m_AgentGroup.EndGroupEpisode();
             ResetScene();
@@ -231,8 +231,8 @@ public class DungeonEscapeEnvController : MonoBehaviour
             item.Agent.transform.SetPositionAndRotation(pos, rot);
             item.Rb.velocity = Vector3.zero;
             item.Rb.angularVelocity = Vector3.zero;
-            item.Agent.myKey.SetActive(false);
-            item.Agent.IHaveAKey = false;
+            item.Agent.myFlag.SetActive(false);
+            item.Agent.IHaveAFlag = false;
             item.Agent.gameObject.SetActive(true);
             m_AgentGroup.RegisterAgent(item.Agent);
         }

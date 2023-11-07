@@ -30,6 +30,11 @@ TagManager:
   - purpleAgent
   - purpleGoal
   - tile
+  - key
+  - portal
+  - dragon
+  - lock
+  - flag
   layers:
   - Default
   - TransparentFX

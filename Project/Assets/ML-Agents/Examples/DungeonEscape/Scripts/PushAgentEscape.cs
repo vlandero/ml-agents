@@ -3,52 +3,82 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
+public enum CTFTeam
+{
+    Blue,
+    Red
+}
+
 public class PushAgentEscape : Agent
 {
+    [HideInInspector] public GameObject allyFlag;
+    [HideInInspector] public GameObject enemyFlag;
 
-    public GameObject myKey; //my key gameobject. will be enabled when key picked up.
-    public GameObject worldKey;
-    public bool IHaveAKey; //have i picked up a key
-    private PushBlockSettings m_PushBlockSettings;
-    private Rigidbody m_AgentRb;
-    private DungeonEscapeEnvController m_GameController;
-    float rewardScaleFactor = .001f;
+    [Header("Agent Stats")]
+    public CTFTeam myTeam;
+    public GameObject myFlag;
+    public bool IHaveAFlag;
 
+    [Header("Materials")]
+    public Material blueMaterial;
+    public Material redMaterial;
+
+    [Header("Agent Settings")]
+    public float rewardScaleFactor = .001f;
+
+    private CTFPlatform m_platform;
     private Vector2 zBound = new Vector2(-11f, 11f);
     private Vector2 xBound = new Vector2(-11f, 11f);
-    private float yBound = 0.58f;
+    private float yBoundAgent = 0.58f;
+    private float yBoundFlag = 0.17f;
+    private PushBlockSettings m_PushBlockSettings;
+    private Rigidbody m_AgentRb;
+
+    private void Start()
+    {
+        m_platform = GetComponentInParent<CTFPlatform>();
+        if(myTeam == CTFTeam.Red)
+        {
+            allyFlag = m_platform.redFlag;
+            enemyFlag = m_platform.blueFlag;
+        }
+        else
+        {
+            enemyFlag = m_platform.redFlag;
+            allyFlag = m_platform.blueFlag;
+        }
+    }
 
     public override void Initialize()
     {
-        m_GameController = GetComponentInParent<DungeonEscapeEnvController>();
         m_AgentRb = GetComponent<Rigidbody>();
         m_PushBlockSettings = FindObjectOfType<PushBlockSettings>();
-        myKey.SetActive(false);
-        IHaveAKey = false;
     }
 
     public override void OnEpisodeBegin()
     {
-        transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
-        worldKey.transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
-        myKey.SetActive(false);
-        IHaveAKey = false;
+        transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundAgent, Random.Range(xBound.x, xBound.y));
+        enemyFlag.transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundFlag, Random.Range(xBound.x, xBound.y));
+        myFlag.SetActive(false);
+        enemyFlag.SetActive(true);
+        allyFlag.SetActive(true);
+        IHaveAFlag = false;
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(IHaveAKey);
+        sensor.AddObservation(IHaveAFlag);
 
-        if (!IHaveAKey) // Only do this if we haven't picked up the key
+        if (!IHaveAFlag)
         {
-            GiveRewardBasedOnDistanceToKey();
+            GiveRewardBasedOnDistanceToFlag();
         }
     }
 
-    private void GiveRewardBasedOnDistanceToKey()
+    private void GiveRewardBasedOnDistanceToFlag()
     {
-        float distanceToKey = Vector3.Distance(transform.position, worldKey.transform.position);
-        float reward = -distanceToKey;
+        float distanceToEnemyFlag = Vector3.Distance(transform.localPosition, enemyFlag.transform.localPosition);
+        float reward = -distanceToEnemyFlag;
         AddReward(reward * rewardScaleFactor);
     }
 
@@ -105,37 +135,47 @@ public class PushAgentEscape : Agent
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.transform.CompareTag("lock"))
-        {
-            if (IHaveAKey)
-            {
-                myKey.SetActive(false);
-                IHaveAKey = false;
-                m_GameController.UnlockDoor();
-            }
-        }
-        if (col.transform.CompareTag("dragon"))
-        {
-            m_GameController.KilledByBaddie(this, col);
-            myKey.SetActive(false);
-            IHaveAKey = false;
-        }
-        if (col.transform.CompareTag("portal"))
-        {
-            m_GameController.TouchedHazard(this);
-        }
+        //if (col.transform.CompareTag("lock"))
+        //{
+        //    if (IHaveAKey)
+        //    {
+        //        myKey.SetActive(false);
+        //        IHaveAKey = false;
+        //        m_GameController.UnlockDoor();
+        //    }
+        //}
+        //if (col.transform.CompareTag("dragon"))
+        //{
+        //    m_GameController.KilledByBaddie(this, col);
+        //    myKey.SetActive(false);
+        //    IHaveAKey = false;
+        //}
+        //if (col.transform.CompareTag("portal"))
+        //{
+        //    m_GameController.TouchedHazard(this);
+        //}
+    }
+
+    private void PickUpEnemyFlag()
+    {
+        print("Picked up flag");
+        myFlag.SetActive(true);
+        IHaveAFlag = true;
+        enemyFlag.SetActive(false);
     }
 
     void OnTriggerEnter(Collider col)
     {
         //if we find a key and it's parent is the main platform we can pick it up
-        if (col.transform.CompareTag("key") && col.transform.parent == transform.parent && gameObject.activeInHierarchy)
+        if (col.transform.CompareTag("flag") && col.transform.parent == transform.parent && gameObject.activeInHierarchy)
         {
-            print("Picked up key");
-            myKey.SetActive(true);
-            IHaveAKey = true;
+            if(col.GetComponent<Flag>().team == myTeam)
+            {
+                return;
+            }
+            PickUpEnemyFlag();
             AddReward(1f);
-            EndEpisode();
+            //EndEpisode();
         }
     }
 

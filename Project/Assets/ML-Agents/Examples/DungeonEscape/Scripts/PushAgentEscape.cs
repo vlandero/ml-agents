@@ -30,7 +30,7 @@ public class PushAgentEscape : Agent
     public override void OnEpisodeBegin()
     {
         transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
-        // WorldKey.transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
+        worldKey.transform.position = new Vector3(Random.Range(zBound.x, zBound.y), yBound, Random.Range(xBound.x, xBound.y)) + transform.parent.position;
         myKey.SetActive(false);
         IHaveAKey = false;
     }

@@ -7,7 +7,7 @@ public class FlagCloth : MonoBehaviour
     [SerializeField] private Material blueMaterial;
     [SerializeField] private Material redMaterial;
 
-    [SerializeField] private PushAgentEscape agent;
+    [SerializeField] private CTFAgent agent;
     private void Start()
     {
         if(agent.myTeam == CTFTeam.Blue)

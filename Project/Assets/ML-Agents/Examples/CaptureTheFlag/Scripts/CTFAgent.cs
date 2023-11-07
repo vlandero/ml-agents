@@ -1,15 +1,16 @@
-using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
+using UnityEngine;
 
 public enum CTFTeam
 {
     Blue,
     Red
 }
-
-public class PushAgentEscape : Agent
+public class CTFAgent : Agent
 {
     [HideInInspector] public GameObject allyFlag;
     [HideInInspector] public GameObject enemyFlag;
@@ -37,7 +38,7 @@ public class PushAgentEscape : Agent
     private void Start()
     {
         m_platform = GetComponentInParent<CTFPlatform>();
-        if(myTeam == CTFTeam.Red)
+        if (myTeam == CTFTeam.Red)
         {
             allyFlag = m_platform.redFlag;
             enemyFlag = m_platform.blueFlag;
@@ -58,11 +59,13 @@ public class PushAgentEscape : Agent
     public override void OnEpisodeBegin()
     {
         transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundAgent, Random.Range(xBound.x, xBound.y));
-        enemyFlag.transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundFlag, Random.Range(xBound.x, xBound.y));
         myFlag.SetActive(false);
+        IHaveAFlag = false;
+
+        enemyFlag.transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundFlag, Random.Range(xBound.x, xBound.y));
+        allyFlag.transform.localPosition = new Vector3(Random.Range(zBound.x, zBound.y), yBoundFlag, Random.Range(xBound.x, xBound.y));
         enemyFlag.SetActive(true);
         allyFlag.SetActive(true);
-        IHaveAFlag = false;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -82,9 +85,6 @@ public class PushAgentEscape : Agent
         AddReward(reward * rewardScaleFactor);
     }
 
-    /// <summary>
-    /// Moves the agent according to the selected action.
-    /// </summary>
     public void MoveAgent(ActionSegment<int> act)
     {
         var dirToGo = Vector3.zero;
@@ -118,12 +118,8 @@ public class PushAgentEscape : Agent
             ForceMode.VelocityChange);
     }
 
-    /// <summary>
-    /// Called every step of the engine. Here the agent takes an action.
-    /// </summary>
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        // Move the agent using the action.
         MoveAgent(actionBuffers.DiscreteActions);
 
         if (StepCount >= MaxStep - 1)
@@ -135,25 +131,6 @@ public class PushAgentEscape : Agent
 
     void OnCollisionEnter(Collision col)
     {
-        //if (col.transform.CompareTag("lock"))
-        //{
-        //    if (IHaveAKey)
-        //    {
-        //        myKey.SetActive(false);
-        //        IHaveAKey = false;
-        //        m_GameController.UnlockDoor();
-        //    }
-        //}
-        //if (col.transform.CompareTag("dragon"))
-        //{
-        //    m_GameController.KilledByBaddie(this, col);
-        //    myKey.SetActive(false);
-        //    IHaveAKey = false;
-        //}
-        //if (col.transform.CompareTag("portal"))
-        //{
-        //    m_GameController.TouchedHazard(this);
-        //}
     }
 
     private void PickUpEnemyFlag()
@@ -166,10 +143,9 @@ public class PushAgentEscape : Agent
 
     void OnTriggerEnter(Collider col)
     {
-        //if we find a key and it's parent is the main platform we can pick it up
         if (col.transform.CompareTag("flag") && col.transform.parent == transform.parent && gameObject.activeInHierarchy)
         {
-            if(col.GetComponent<Flag>().team == myTeam)
+            if (col.GetComponent<Flag>().team == myTeam)
             {
                 return;
             }

@@ -35,6 +35,8 @@ TagManager:
   - dragon
   - lock
   - flag
+  - redflag
+  - blueflag
   layers:
   - Default
   - TransparentFX

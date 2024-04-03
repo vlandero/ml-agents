@@ -37,6 +37,7 @@ TagManager:
   - flag
   - redflag
   - blueflag
+  - interactionSphere
   layers:
   - Default
   - TransparentFX

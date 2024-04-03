@@ -10,7 +10,12 @@ public class FlagCloth : MonoBehaviour
     [SerializeField] private CTFAgent agent;
     private void Start()
     {
-        if(agent.myTeam == CTFTeam.Blue)
+        ResetTeam();
+    }
+
+    public void ResetTeam()
+    {
+        if (agent.myTeam == CTFTeam.Blue)
         {
             GetComponent<Renderer>().material = redMaterial;
         }

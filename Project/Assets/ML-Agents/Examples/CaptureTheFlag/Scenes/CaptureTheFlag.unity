@@ -530,7 +530,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &272740950
 PrefabInstance:
@@ -863,20 +863,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 727239226, guid: 5878a6d7527854d0a84b133c7c6efe55, type: 3}
-      propertyPath: m_PresetInfoIsWorld
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1289969388672091855, guid: 5878a6d7527854d0a84b133c7c6efe55,
-        type: 3}
-      propertyPath: rewardScaleFactor
-      value: 0.0006
-      objectReference: {fileID: 0}
-    - target: {fileID: 1917226959654427030, guid: 5878a6d7527854d0a84b133c7c6efe55,
-        type: 3}
-      propertyPath: m_BehaviorType
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2508780962454810567, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}
       propertyPath: m_Name
@@ -941,11 +927,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8509354141486642307, guid: 5878a6d7527854d0a84b133c7c6efe55,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1478,18 +1459,7 @@ PrefabInstance:
     - target: {fileID: 1289969388672091855, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}
       propertyPath: myTeam
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1917226959654427030, guid: 5878a6d7527854d0a84b133c7c6efe55,
-        type: 3}
-      propertyPath: m_Model
-      value: 
-      objectReference: {fileID: 5022602860645237092, guid: d480c52be766ae74196e7ba8b560fc04,
-        type: 3}
-    - target: {fileID: 1917226959654427030, guid: 5878a6d7527854d0a84b133c7c6efe55,
-        type: 3}
-      propertyPath: m_BehaviorType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2508780962454810567, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}
@@ -1499,7 +1469,7 @@ PrefabInstance:
     - target: {fileID: 2512227112770887927, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2512227112770887927, guid: 5878a6d7527854d0a84b133c7c6efe55,
         type: 3}

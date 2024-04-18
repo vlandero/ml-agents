@@ -1,11 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 using UnityEngine;
-using Unity.Sentis.Layers;
-using TMPro;
 
 public enum CTFTeam
 {
@@ -24,6 +20,9 @@ public class CTFAgent : Agent
     [HideInInspector] public GameObject allyFlag;
     [HideInInspector] public GameObject enemyFlag;
 
+    public Animator animator;
+    public bool isRandomizingTeam = false;
+
     [Header("Agent Stats")]
     public CTFTeam myTeam;
     public GameObject myFlag;
@@ -33,40 +32,42 @@ public class CTFAgent : Agent
     public Material blueMaterial;
     public Material redMaterial;
 
+    [Header("Controls")]
+    public KeyCode forwardKey = KeyCode.W;
+    public KeyCode backwardKey = KeyCode.S;
+    public KeyCode rotateLeftKey = KeyCode.A;
+    public KeyCode rotateRightKey = KeyCode.D;
+    public KeyCode attackKey = KeyCode.E;
+
+    [Header("Episode Information")]
+    public bool endEpisodeOnTakeFlag = false;
+
     [Header("Rewards")]
     public float rewardScaleFactorForAngle = .0001f;
     public float rewardScaleFactorForDistance = .0001f;
-    public float rewardForMovingToTarget = .08f;
-    public float rewardForCapturingEnemyFlag = .9f;
-    public float rewardForReturningFlag = 10f;
     public float rewardScaleFactorForAngleOnTrigger = .005f;
     public float rewardForExceedingMaxSteps = -.5f;
-    public float rewardOnWallCollision = -.01f;
+    //public float rewardOnWallCollision = -.01f;
     public float rewardOnOtherFlagCollision = -3f;
-    public float rewardOnHittingEnemyWithoutFlag = .5f;
-    public float rewardOnHittingEnemyWithFlag = 7f;
-    public float rewardForMovingToEnemyWithFlag = .1f;
-    public float rewardForLookingToEnemyWithFlag = .1f;
+    public float rewardForKillingEnemy = 1f;
+    public float rewardForKillingEnemyWithFlag = 6f;
+    public float rewardForBeingKilled = -1f;
+    public float rewardForNotMoving = -0.001f;
+    public float rewardOverTime = -0.00001f;
 
     private CTFPlatform m_platform;
     private Vector2 xBound = new Vector2(-11f, 11f);
-    private Vector2 xBoundPlayer = new Vector2(-11f, 11f);
-    private Vector2 zBound = new Vector2(-11f, 11f);
-    //private Vector2 zBoundRed = new Vector2(-11f, -2.5f);
-    //private Vector2 zBoundBlue = new Vector2(2.5f, 11f);
     private Vector2 zBoundRed = new Vector2(-11f, -9f);
     private Vector2 zBoundBlue = new Vector2(9f, 11f);
     private float yBoundAgent = 0.58f;
-    private float yBoundFlag = 0.17f;
     private PushBlockSettings m_PushBlockSettings;
     private Rigidbody m_AgentRb;
 
     private bool allyFlagCaptured;
     private bool enemyFlagCaptured;
-    private GameObject playerToInteractWith = null;
+    public CTFAgent playerToInteractWith = null;
 
-    private float totalReward = 0;
-
+    public float totalReward = 0;
 
     private void Start()
     {
@@ -113,30 +114,15 @@ public class CTFAgent : Agent
         IHaveAFlag = false;
     }
 
-    public void RandomSpawnFlags()
-    {
-        if (myTeam == CTFTeam.Red)
-        {
-            enemyFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), yBoundFlag, Random.Range(zBoundRed.x, zBoundRed.y));
-            allyFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), yBoundFlag, Random.Range(zBoundBlue.x, zBoundBlue.y));
-        }
-        else
-        {
-            enemyFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), yBoundFlag, Random.Range(zBoundBlue.x, zBoundBlue.y));
-            allyFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), yBoundFlag, Random.Range(zBoundRed.x, zBoundRed.y));
-        }
-    }
-
     public override void OnEpisodeBegin()
     {
-        RandomizeTeam();
+        //Debug.Log("total reward: " + totalReward + " for team: " + myTeam);
+        totalReward = 0;
+        if(isRandomizingTeam)
+        {
+            RandomizeTeam();
+        }
         Respawn();
-        m_platform.ResetCaptured();
-        m_platform.ResetAgentsLists();
-        //RandomSpawnFlags();
-
-        enemyFlag.SetActive(true);
-        allyFlag.SetActive(true);
     }
 
     private void AssignCapturedFlags()
@@ -151,31 +137,6 @@ public class CTFAgent : Agent
             allyFlagCaptured = m_platform.blueFlagCaptured;
             enemyFlagCaptured = m_platform.redFlagCaptured;
         }
-    }   
-
-    private GameObject GetEnemyWithFlag()
-    {
-        if(myTeam == CTFTeam.Red)
-        {
-            foreach (var agent in m_platform.blueAgents)
-            {
-                if(agent.GetComponent<CTFAgent>().IHaveAFlag)
-                {
-                    return agent;
-                }
-            }
-        }
-        else
-        {
-            foreach (var agent in m_platform.redAgents)
-            {
-                if (agent.GetComponent<CTFAgent>().IHaveAFlag)
-                {
-                    return agent;
-                }
-            }
-        }
-        return null;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -190,9 +151,9 @@ public class CTFAgent : Agent
         {
             if (allyFlagCaptured)
             {
-                GameObject enemyWithFlag = GetEnemyWithFlag();
-                MovingToTargetPositiveReward(enemyWithFlag.transform.localPosition, rewardForMovingToEnemyWithFlag);
-                GiveRewardBasedOnLookingDirectionToTarget(enemyWithFlag, rewardForLookingToEnemyWithFlag);
+                // give reward based on distance to enemy, looking direction to enemy. he should kill the enemy
+                GiveRewardBasedOnDistanceToEnemyWithFlag();
+                GiveRewardBasedOnLookingDirectionEnemyWithFlag();
             }
             else
             {
@@ -200,7 +161,6 @@ public class CTFAgent : Agent
                 {
                     GiveRewardBasedOnDistanceToFlag(CTFAllyEnemy.Ally);
                     GiveRewardBasedOnLookingDirectionFlag(CTFAllyEnemy.Ally);
-                    MovingToTargetPositiveReward(allyFlag.transform.position, rewardForMovingToTarget);
                 }
                 else
                 {
@@ -211,13 +171,15 @@ public class CTFAgent : Agent
         {
             GiveRewardBasedOnDistanceToFlag(CTFAllyEnemy.Enemy);
             GiveRewardBasedOnLookingDirectionFlag(CTFAllyEnemy.Enemy);
-            MovingToTargetPositiveReward(enemyFlag.transform.position, rewardForMovingToTarget);
         }
-        totalReward = 0;
+        //totalReward = 0;
+        AddReward(rewardOverTime);
+        totalReward += rewardOverTime;
     }
 
     public void MoveAgent(ActionSegment<int> act)
     {
+        bool hasMoved = false;
         var dirToGo = Vector3.zero;
         var rotateDir = Vector3.zero;
 
@@ -226,9 +188,11 @@ public class CTFAgent : Agent
         switch (action)
         {                
             case 1:
+                hasMoved = true;
                 dirToGo = transform.forward * 1f;
                 break;
             case 2:
+                hasMoved = true;
                 dirToGo = transform.forward * -1f;
                 break;
             case 3:
@@ -238,36 +202,53 @@ public class CTFAgent : Agent
                 rotateDir = transform.up * -1f;
                 break;
             case 5:
+                hasMoved = true;
                 dirToGo = transform.right * -0.75f;
                 break;
             case 6:
+                hasMoved = true;
                 dirToGo = transform.right * 0.75f;
                 break;
             case 7:
-                if (playerToInteractWith)
+                if (playerToInteractWith != null && playerToInteractWith.myTeam != myTeam)
                 {
-                    CTFAgent enemyCTFAgent = playerToInteractWith.GetComponent<CTFAgent>();
-                    if (enemyCTFAgent && enemyCTFAgent.myTeam != myTeam)
+                    animator.SetTrigger("Attack");
+                    if(playerToInteractWith.IHaveAFlag)
                     {
-                        Debug.Log("SHOULD NOT GET HERE CASE 7");
-                        if (IHaveAFlag && enemyCTFAgent.IHaveAFlag)
+                        allyFlag.SetActive(true);
+                        if(myTeam == CTFTeam.Red)
                         {
-                            AddReward(rewardOnHittingEnemyWithFlag);
-                            EndEpisode();
-                            //enemyCTFAgent.Respawn();
-                            //enemyFlag.SetActive(true);
+                            m_platform.redFlagCaptured = false;
                         }
                         else
                         {
-                            AddReward(rewardOnHittingEnemyWithoutFlag);
+                            m_platform.blueFlagCaptured = false;
                         }
+                        AddReward(rewardForKillingEnemyWithFlag);
+                        totalReward += rewardForKillingEnemyWithFlag;
+
                     }
+                    else
+                    {
+                        AddReward(rewardForKillingEnemy);
+                        totalReward += rewardForKillingEnemy;
+                    }
+                    playerToInteractWith.Respawn();
+                    playerToInteractWith.AddReward(rewardForBeingKilled);
+                    playerToInteractWith.totalReward += rewardForBeingKilled;
                 }
+                hasMoved = true;
                 break;
         }
         transform.Rotate(rotateDir, Time.fixedDeltaTime * 200f);
         m_AgentRb.AddForce(dirToGo * m_PushBlockSettings.agentRunSpeed,
             ForceMode.VelocityChange);
+        if(!hasMoved)
+        {
+            //Debug.Log("Not moved " + myTeam);
+            AddReward(rewardForNotMoving);
+            totalReward += rewardForNotMoving;
+        }
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
@@ -276,8 +257,9 @@ public class CTFAgent : Agent
 
         if (StepCount >= MaxStep - 1)
         {
+            Debug.Log("Reached max steps");
             AddReward(rewardForExceedingMaxSteps);
-            EndEpisode();
+            m_platform.EndEpisode();
         }
     }
 
@@ -292,23 +274,22 @@ public class CTFAgent : Agent
     {
         string enemyTag = myTeam == CTFTeam.Red ? "blueflag" : "redflag";
         string allyTag = myTeam == CTFTeam.Red ? "redflag" : "blueflag";
-        if (col.CompareTag("interactionSphere"))
-        {
-            playerToInteractWith = col.gameObject.transform.parent.gameObject;
-        }
-        if(col.transform.parent == transform.parent && gameObject.activeInHierarchy)
+        if(gameObject.activeInHierarchy)
         {
             if(col.transform.CompareTag(allyTag))
             {
                 if (!enemyFlagCaptured)
                 {
                     AddReward(rewardOnOtherFlagCollision);
+                    totalReward += rewardOnOtherFlagCollision;
                 }
                 else if(IHaveAFlag && !allyFlagCaptured)
                 {
                     FinishCapture();
-                    AddReward(rewardForReturningFlag - GetAngleToObject(col.gameObject) * rewardScaleFactorForAngleOnTrigger);
-                    EndEpisode();
+                    var angleToFlag = GetAngleToFlag(CTFAllyEnemy.Ally);
+                    m_platform.CaptureFlagRewards(myTeam, angleToFlag * rewardScaleFactorForAngleOnTrigger);
+                    Debug.Log("winning team: " + myTeam);
+                    m_platform.EndEpisode();
                 }
             }
             else if (col.transform.CompareTag(enemyTag))
@@ -316,8 +297,12 @@ public class CTFAgent : Agent
                 if (!enemyFlagCaptured)
                 {
                     PickUpEnemyFlag();
-                    AddReward(rewardForCapturingEnemyFlag - GetAngleToObject(col.gameObject) * rewardScaleFactorForAngleOnTrigger);
-                    //EndEpisode();
+                    var angleToFlag = GetAngleToFlag(CTFAllyEnemy.Enemy);
+                    m_platform.TakeFlagRewards(myTeam, angleToFlag * rewardScaleFactorForAngleOnTrigger);
+                    if(endEpisodeOnTakeFlag)
+                    {
+                        m_platform.EndEpisode();
+                    }
                 }
             }
         }
@@ -335,31 +320,31 @@ public class CTFAgent : Agent
     {
         if (collision.transform.CompareTag("wall"))
         {
-            AddReward(rewardOnWallCollision);
-            EndEpisode();
+            //AddReward(rewardOnWallCollision);
+            // m_platform.EndEpisode();
         }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(rotateRightKey))
         {
             discreteActionsOut[0] = 3;
         }
-        else if (Input.GetKey(KeyCode.W))
+        else if (Input.GetKey(forwardKey))
         {
             discreteActionsOut[0] = 1;
         }
-        else if (Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(rotateLeftKey))
         {
             discreteActionsOut[0] = 4;
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(backwardKey))
         {
             discreteActionsOut[0] = 2;
         }
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKey(attackKey))
         {
             discreteActionsOut[0] = 7;
         }
@@ -386,16 +371,21 @@ public class CTFAgent : Agent
         CaptureEnemyFlag();
     }
 
+    private float GetDistanceToObject(GameObject o)
+    {
+        return Vector3.Distance(transform.localPosition, o.transform.localPosition);
+    }
+
     private float GetDistanceToFlag(CTFAllyEnemy c)
     {
         float d;
         if (c == CTFAllyEnemy.Ally)
         {
-            d = Vector3.Distance(transform.localPosition, allyFlag.transform.localPosition);
+            d = GetDistanceToObject(allyFlag);
         }
         else
         {
-            d = Vector3.Distance(transform.localPosition, enemyFlag.transform.localPosition);
+            d = GetDistanceToObject(enemyFlag);
         }
         return d;
     }
@@ -405,11 +395,11 @@ public class CTFAgent : Agent
         float angle;
         if (c == CTFAllyEnemy.Ally)
         {
-            angle = Vector3.Angle(transform.forward, allyFlag.transform.localPosition - transform.localPosition);
+            angle = GetAngleToObject(allyFlag);
         }
         else
         {
-            angle = Vector3.Angle(transform.forward, enemyFlag.transform.localPosition - transform.localPosition);
+            angle = GetAngleToObject(enemyFlag);
         }
         float d = Mathf.Abs(angle);
         return d;
@@ -438,26 +428,29 @@ public class CTFAgent : Agent
         totalReward += d * rewardScaleFactorForAngle;
     }
 
-    private void GiveRewardBasedOnDistanceToTarget(Vector3 target, float scaleFactor)
+    private void GiveRewardBasedOnDistanceToEnemyWithFlag()
     {
-        float d = -Vector3.Distance(transform.localPosition, target);
-        AddReward(d * scaleFactor);
-        totalReward += d * scaleFactor;
+        CTFAgent enemyWithFlag = m_platform.GetEnemyWithFlag(myTeam == CTFTeam.Red ? CTFTeam.Blue : CTFTeam.Red);
+        if (enemyWithFlag != null)
+        {
+            float d = -GetDistanceToObject(enemyWithFlag.gameObject);
+            AddReward(d * rewardScaleFactorForDistance);
+            //Debug.Log("Distance reward: " + myTeam + ": " + d * rewardScaleFactorForDistance);
+            totalReward += d * rewardScaleFactorForDistance;
+        }
     }
 
-    private void GiveRewardBasedOnLookingDirectionToTarget(GameObject target, float scaleFactor)
+    private void GiveRewardBasedOnLookingDirectionEnemyWithFlag()
     {
-        float d = -GetAngleToObject(target);
-        AddReward(d * scaleFactor);
-        totalReward += d * scaleFactor;
+        CTFAgent enemyWithFlag = m_platform.GetEnemyWithFlag(myTeam == CTFTeam.Red ? CTFTeam.Blue : CTFTeam.Red);
+        if (enemyWithFlag != null)
+        {
+            float d = -GetAngleToObject(enemyWithFlag.gameObject);
+            AddReward(d * rewardScaleFactorForAngle);
+            //Debug.Log("Angle reward for " + myTeam + ": " + d * rewardScaleFactorForAngle);
+            totalReward += d * rewardScaleFactorForAngle;
+        }
     }
 
-    private void MovingToTargetPositiveReward(Vector3 targetPosition, float scaleFactor)
-    {
-        Vector3 toTarget = (targetPosition - transform.position).normalized;
-        float dotProduct = Vector3.Dot(toTarget, m_AgentRb.velocity.normalized);
-        //Debug.Log("adding dotproduct reward " + dotProduct * scaleFactor);
-        AddReward(dotProduct * scaleFactor);
-        totalReward += dotProduct * scaleFactor;
-    }
+    
 }

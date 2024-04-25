@@ -54,8 +54,8 @@ MonoBehaviour:
   - redAgentWithFlag
   - blueAgentWithFlag
   - blueAgent
-  m_RaysPerDirection: 16
-  m_MaxRayDegrees: 79.6
+  m_RaysPerDirection: 19
+  m_MaxRayDegrees: 55
   m_SphereCastRadius: 0.5
   m_RayLength: 116
   m_RayLayerMask:
@@ -332,7 +332,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 1f808c0553a86d846a135040ffba85ca, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: CaptureTheFlagBehavior
@@ -356,11 +356,11 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 10000
+  MaxStep: 15000
   allyFlag: {fileID: 0}
   enemyFlag: {fileID: 0}
   animator: {fileID: 5420305329175775422}
-  isRandomizingTeam: 1
+  teamNumber: 0
   myTeam: 1
   myFlag: {fileID: 8588277821356394578}
   IHaveAFlag: 0
@@ -371,17 +371,26 @@ MonoBehaviour:
   rotateLeftKey: 276
   rotateRightKey: 275
   attackKey: 323
-  endEpisodeOnTakeFlag: 1
-  rewardScaleFactorForAngle: 0.00001
-  rewardScaleFactorForDistance: 0.001
-  rewardScaleFactorForAngleOnTrigger: 0.008
-  rewardForExceedingMaxSteps: -10
-  rewardOnOtherFlagCollision: -1
-  rewardForKillingEnemy: 1
-  rewardForKillingEnemyWithFlag: 3
-  rewardForBeingKilled: -10
+  endEpisodeOnTakeFlag: 0
+  endEpisodeOnWallCollision: 0
+  isChangingTag: 1
+  rewardScaleFactorForAngle: 0
+  rewardScaleFactorForDistance: 0
+  rewardScaleFactorForAngleOnTrigger: 0
+  rewardForExceedingMaxSteps: 0
+  rewardOnWallCollision: 0
+  rewardOnOtherFlagCollision: 0
+  rewardForKillingEnemy: 0
+  rewardForKillingEnemyWithFlag: 0
+  rewardForBeingKilled: 0
   rewardForNotMoving: 0
   rewardOverTime: 0
+  bothFlagsCapturedIHaveAFlag: 0
+  bothFlagsCapturedIDontHaveAFlag: 0
+  onlyEnemyFlagCapturedIHaveAFlag: 3
+  onlyEnemyFlagCapturedIDontHaveAFlag: 1
+  onlyAllyFlagCaptured: 2
+  noFlagsCaptured: 2
   playerToInteractWith: {fileID: 0}
   totalReward: 0
 --- !u!65 &4894871342018226889

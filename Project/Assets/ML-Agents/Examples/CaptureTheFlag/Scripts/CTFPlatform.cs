@@ -12,12 +12,12 @@ public class CTFPlatform : MonoBehaviour
     public int blueScore = 0;
     public int redScore = 0;
 
+    public Dictionary<int, CTFTeam> Teams = new Dictionary<int, CTFTeam>();
+
     public List<GameObject> redAgents = new List<GameObject>();
     public List<GameObject> blueAgents = new List<GameObject>();
 
-    private Vector2 zBoundRed = new Vector2(-11f, -9f);
-    private Vector2 zBoundBlue = new Vector2(9f, 11f);
-    private Vector2 xBound = new Vector2(-11f, 11f);
+    public bool isRandomizingTeam = false;
 
     [Header("Agent Rewards")]
     public float rewardForCapture = 10f;
@@ -25,6 +25,32 @@ public class CTFPlatform : MonoBehaviour
     public float rewardForTake = 1f;
     public float rewardForBeingTaken = -1f;
 
+    [Header("Spawn Points")]
+    [HideInInspector] public Transform[] redSpawnBounds;
+    [HideInInspector] public Transform[] blueSpawnBounds;
+    public GameObject redSpawn;
+    public GameObject blueSpawn;
+
+    private void Awake()
+    {
+        GameObject C1Red = redSpawn.transform.GetChild(0).gameObject;
+        GameObject C2Red = redSpawn.transform.GetChild(1).gameObject;
+
+        GameObject C1Blue = blueSpawn.transform.GetChild(0).gameObject;
+        GameObject C2Blue = blueSpawn.transform.GetChild(1).gameObject;
+
+        redSpawnBounds = new Transform[] { C1Red.transform, C2Red.transform };
+        blueSpawnBounds = new Transform[] { C1Blue.transform, C2Blue.transform };
+    }
+    private void Start()
+    {
+        Teams.Add(0, CTFTeam.Red);
+        Teams.Add(1, CTFTeam.Blue);
+        ResetCaptured();
+        ResetAgentsLists();
+        RandomSpawnFlags();        
+    }
+    
     public void ResetAgentsLists()
     {
         redAgents = new List<GameObject>();
@@ -32,7 +58,7 @@ public class CTFPlatform : MonoBehaviour
 
         foreach (Transform child in transform)
         {
-            if (child.CompareTag("agent"))
+            if (child.CompareTag("agent") || child.CompareTag("redAgent") || child.CompareTag("redAgentWithFlag") || child.CompareTag("blueAgentWithFlag") || child.CompareTag("blueAgent"))
             {
                 var comp = child.GetComponent<CTFAgent>();
                 if (comp && comp.myTeam == CTFTeam.Red)
@@ -47,17 +73,16 @@ public class CTFPlatform : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void RandomizeTeams()
     {
-        ResetCaptured();
-        ResetAgentsLists();
-        RandomSpawnFlags();
+        Teams[0] = (CTFTeam)Random.Range(0, 2);
+        Teams[1] = Teams[0] == CTFTeam.Red ? CTFTeam.Blue : CTFTeam.Red;
     }
 
     public void RandomSpawnFlags()
     {
-        blueFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), 0.17f, Random.Range(zBoundRed.x, zBoundRed.y));
-        redFlag.transform.localPosition = new Vector3(Random.Range(xBound.x, xBound.y), 0.17f, Random.Range(zBoundBlue.x, zBoundBlue.y));
+        blueFlag.transform.position = new Vector3(Random.Range(blueSpawnBounds[0].position.x, blueSpawnBounds[1].position.x), blueSpawnBounds[0].position.y, Random.Range(blueSpawnBounds[0].position.z, blueSpawnBounds[1].position.z));
+        redFlag.transform.position = new Vector3(Random.Range(redSpawnBounds[0].position.x, redSpawnBounds[1].position.x), redSpawnBounds[0].position.y, Random.Range(redSpawnBounds[0].position.z, redSpawnBounds[1].position.z));
     }
 
     public void AddScore(CTFTeam team)
@@ -78,6 +103,16 @@ public class CTFPlatform : MonoBehaviour
 
     public void EndEpisode()
     {
+        ResetCaptured();
+        RandomSpawnFlags();
+        blueScore = 0;
+        redScore = 0;
+        blueFlag.SetActive(true);
+        redFlag.SetActive(true);
+        if(isRandomizingTeam)
+        {
+            RandomizeTeams();
+        }
         foreach (var agent in redAgents)
         {
             agent.GetComponent<CTFAgent>().EndEpisode();
@@ -87,14 +122,7 @@ public class CTFPlatform : MonoBehaviour
         {
             agent.GetComponent<CTFAgent>().EndEpisode();
         }
-
-        ResetCaptured();
         ResetAgentsLists();
-        RandomSpawnFlags();
-        blueScore = 0;
-        redScore = 0;
-        blueFlag.SetActive(true);
-        redFlag.SetActive(true);
     }
 
     public void CaptureFlagRewards(CTFTeam team, float m)
@@ -103,24 +131,32 @@ public class CTFPlatform : MonoBehaviour
         {
             foreach (var agent in redAgents)
             {
-                agent.GetComponent<CTFAgent>().AddReward(rewardForCapture - rewardForCapture * m);
+                var ctfa = agent.GetComponent<CTFAgent>();
+                ctfa.AddReward(rewardForCapture - rewardForCapture * m);
+                ctfa.totalReward += rewardForCapture - rewardForCapture * m;
             }
 
             foreach (var agent in blueAgents)
             {
-                agent.GetComponent<CTFAgent>().AddReward(rewardForBeingCaptured);
+                var ctfa = agent.GetComponent<CTFAgent>();
+                ctfa.AddReward(rewardForBeingCaptured);
+                ctfa.totalReward += rewardForBeingCaptured;
             }
         }
         else
         {
             foreach (var agent in blueAgents)
             {
-                agent.GetComponent<CTFAgent>().AddReward(rewardForCapture - rewardForCapture * m);
+                var ctfa = agent.GetComponent<CTFAgent>();
+                ctfa.AddReward(rewardForCapture - rewardForCapture * m);
+                ctfa.totalReward += rewardForCapture - rewardForCapture * m;
             }
 
             foreach (var agent in redAgents)
             {
-                agent.GetComponent<CTFAgent>().AddReward(rewardForBeingCaptured);
+                var ctfa = agent.GetComponent<CTFAgent>();
+                ctfa.AddReward(rewardForBeingCaptured);
+                ctfa.totalReward += rewardForBeingCaptured;
             }
         }
     }
@@ -178,6 +214,32 @@ public class CTFPlatform : MonoBehaviour
             foreach (var agent in blueAgents)
             {
                 if (agent.GetComponent<CTFAgent>().IHaveAFlag)
+                {
+                    return agent.GetComponent<CTFAgent>();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public CTFAgent GetEnemyWithoutFlag(CTFTeam team)
+    {
+        if (team == CTFTeam.Red)
+        {
+            foreach (var agent in redAgents)
+            {
+                if (!agent.GetComponent<CTFAgent>().IHaveAFlag)
+                {
+                    return agent.GetComponent<CTFAgent>();
+                }
+            }
+        }
+        else
+        {
+            foreach (var agent in blueAgents)
+            {
+                if (!agent.GetComponent<CTFAgent>().IHaveAFlag)
                 {
                     return agent.GetComponent<CTFAgent>();
                 }

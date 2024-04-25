@@ -23,8 +23,6 @@ TagManager:
   - badFood
   - food
   - walkableSurface
-  - symbol_X
-  - symbol_O
   - symbol_X_Goal
   - symbol_O_Goal
   - purpleAgent
@@ -39,6 +37,11 @@ TagManager:
   - blueflag
   - interactionSphere
   - outerWall
+  - redAgent
+  - redAgentWithFlag
+  - symbol_X
+  - symbol_O
+  - blueAgentWithFlag
   layers:
   - Default
   - TransparentFX

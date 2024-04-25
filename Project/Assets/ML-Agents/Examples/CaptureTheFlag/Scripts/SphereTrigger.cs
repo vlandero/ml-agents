@@ -8,7 +8,7 @@ public class SphereTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("agent"))
+        if (other.gameObject.CompareTag("agent") || other.gameObject.CompareTag("blueAgent") || other.gameObject.CompareTag("blueAgentWithFlag") || other.gameObject.CompareTag("redAgent") || other.gameObject.CompareTag("redAgentWithFlag"))
         {
             agent.playerToInteractWith = other.gameObject.GetComponent<CTFAgent>();
         }
@@ -16,7 +16,7 @@ public class SphereTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.CompareTag("agent"))
+        if (other.gameObject.CompareTag("agent") || other.gameObject.CompareTag("blueAgent") || other.gameObject.CompareTag("blueAgentWithFlag") || other.gameObject.CompareTag("redAgent") || other.gameObject.CompareTag("redAgentWithFlag"))
         {
             agent.playerToInteractWith = null;
         }

@@ -107,7 +107,7 @@ Transform:
   - {fileID: 6202068413659510336}
   - {fileID: 1498633878595641322}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9094487489944518275
 MonoBehaviour:
@@ -129,7 +129,7 @@ MonoBehaviour:
   redScore: 0
   redAgents: []
   blueAgents: []
-  isRandomizingTeam: 1
+  isRandomizingTeam: 0
   rewardForCapture: 10
   rewardForBeingCaptured: -10
   rewardForTake: 0
@@ -958,6 +958,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5022602860645237092, guid: 5a6f8238328297c4ba2883b21327b962,
         type: 3}
+    - target: {fileID: 4796904010917588665, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: m_BehaviorType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4828233698206621445, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
         type: 3}
       propertyPath: m_Name
@@ -1025,6 +1030,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
         type: 3}
+      propertyPath: attackKey
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
       propertyPath: teamNumber
       value: 1
       objectReference: {fileID: 0}
@@ -1058,6 +1068,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5022602860645237092, guid: 5a6f8238328297c4ba2883b21327b962,
         type: 3}
+    - target: {fileID: 4796904010917588665, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: m_BehaviorType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4828233698206621445, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
         type: 3}
       propertyPath: m_Name
@@ -1125,8 +1140,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
         type: 3}
+      propertyPath: attackKey
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: forwardKey
+      value: 119
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
       propertyPath: teamNumber
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: backwardKey
+      value: 115
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: rotateLeftKey
+      value: 97
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327680673598616032, guid: 5c71f08a479b5c64287f7fbd35e3d7e9,
+        type: 3}
+      propertyPath: rotateRightKey
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
